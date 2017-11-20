@@ -6,6 +6,7 @@ import sys
 from game import Combat, Monsters, Characters
 from game.Equipment import Equipment
 from game.Characters import Character
+from game.markov import NameGenerator, males, females
 
 FLAGS = None
 
@@ -21,7 +22,8 @@ def main(_):
 
 	m = Monsters.monsters['Goblin']
 
-	p = Character('Letitbi', speed = 30)
+	name = NameGenerator(males + females).generate()
+	p = Character(name, speed = 30)
 	p.randomize()
 	p.equip(Equipment.RIGHT_HAND, Combat.weapons['Dagger'])
 	p.equip(Equipment.LEFT_HAND, Combat.weapons['Glaive'])
@@ -36,6 +38,7 @@ def main(_):
 		c.doRound()
 	print p.name, p.hp
 	print m.name, m.hp
+
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
