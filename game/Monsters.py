@@ -17,8 +17,8 @@ class Monster(object):
 		print 'Damage: ' + str(self.damage)
 		print 'Speed: ' + str(self.speed)
 		print 'Abilities:'
-		for name in self.abilities.all:
-			print  '  ' + name + ': ' + str(self.abilities.get(name)) + ' / ' + str(self.abilities.get(name).modifier)
+		for name in Abilities.all:
+			print  '  ' + name + ': ' + str(self.abilities[name]) + ' / ' + str(Abilities.modifier(self.abilities[name]))
 
 monsters = [
 	Monster('Naga', Damage(8, 9, 18), abilityScores = [14, 15, 14, 16, 15, 17], initiative = 2, speed = 40, ac = 14),

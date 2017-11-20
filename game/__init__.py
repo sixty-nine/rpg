@@ -18,33 +18,32 @@ class Dice(object):
 		best = []
 		minFound = False
 		m = min(all)
-		for i in xrange(4):
+
+		for i in xrange(dices):
 			if not minFound and all[i] == m:
 				minFound = True
 				continue
 			best.append(all[i])
 		return best
 
-
-class Ability(object):
-	def __init__(self, name, score = 0):
-		self.name = name
-		self.score = score
-
-	@property
-	def modifier(self):
-		return int(math.floor(-5 + self.score  / 2))
-
-	def __str__(self):
-		return str(self.score)
+class Roll4AndRemoveWorstStrategy(object):
+	def roll(self):
+		return sum(Dice(6).rollAndRemoveWorst(4))
 
 class Abilities(object):
 
-	all = [
-		'Strength', 'Dexterity', 
-		'Constitution', 'Intelligence', 
-		'Wisdom', 'Charisma'
-	]
+	STRENGTH = 'Strength'
+	DEXTERITY = 'Dexterity'
+	CONSTITUTION = 'Constitution'
+	INTELLIGENCE = 'Intelligence'
+	WISDOM = 'Wisdom'
+	CHARISMA = 'Charisma'
+
+	all = [STRENGTH, DEXTERITY, CONSTITUTION, INTELLIGENCE, WISDOM, CHARISMA]
+
+	@staticmethod
+	def modifier(score):
+		return int(math.floor(-5 + score  / 2))
 
 	def __init__(self, scores = False):
 
@@ -56,17 +55,39 @@ class Abilities(object):
 		for i in xrange(0, len(Abilities.all)):
 			name = Abilities.all[i];
 			score = 0 if not scores else scores[i]
-			self._all[name] = Ability(name, score)
+			self._all[name] = score
 
-	def get(self, name):
+	def keys(self):
+		return self._all.keys()
+
+	def __getitem__(self, key):
+		self.ensureAbilityName(key)
+		return self._all[key]
+
+	def __setitem__(self, key, value):
+		self.ensureAbilityName(key)
+		self._all[key] = value
+
+	def __iter__(self):
+		return self._all.iteritems()
+
+	def __str__(self):
+		s = '';
+		for name in Abilities.all:
+			s += ', ' if s != '' else ''
+			s += '%s: %s' % (name[:3], self._all[name])
+		return '(' + s + ')'
+
+	def ensureAbilityName(self, name):
 		if not name in Abilities.all:
-			raise IndexError('Invalid ability: ' + name)
-		return self._all[name]
+			raise IndexError('"%s" is not an ability name' % name)
 
-	def roll(self):
-		for i in xrange(0, len(Abilities.all)):
-			name = Abilities.all[i];
-			self._all[name] = Ability(name, score)
+	def random(self, strategy):
+		if not 'roll' in dir(strategy):
+			raise ValueError('The strategy must have a roll() method')
+		for name in Abilities.all:
+			self._all[name] = strategy.roll()
 
-	def _randomScore(self):
-		pass
+
+from . import Equipment
+

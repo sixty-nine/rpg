@@ -1,5 +1,6 @@
 import random
-from game import Abilities, Dice
+from game import Abilities, Dice, Roll4AndRemoveWorstStrategy, Combat
+from Equipment import Equipment
 
 class CharacterClass(object):
 
@@ -46,31 +47,31 @@ class Character(object):
 		self.speed = speed
 		self.charClass = charClass if charClass else random.choice(classes)
 		self.setRace(race)
+		self.equipment = Equipment()
 
 	def randomize(self):
 		self.charClass = random.choice(classes)
-		for i, name in enumerate(Abilities.all):
-			self.abilities.get(name).score = sum(Dice(6).rollAndRemoveWorst(4))
+		self.abilities.random(Roll4AndRemoveWorstStrategy())
 		self.setRace(random.choice(races))
 
 	def setRace(self, race):
 		self.race = race
 		if race:
 			for i, name in enumerate(Abilities.all):
-				self.abilities.get(name).score += self.race.attrModifiers[i]		
+				self.abilities[name] += self.race.attrModifiers[i]
+
+	def equip(self, slot, item):
+		if item.minLevel > self.level:
+			raise ValueError('You don\'t have the level to use ' + str(item))
+		self.equipment.equip(slot, item)
 
 	def dump(self):
 		print 'Character: ' + self.name
 		print 'Race: ' + self.race.name + ', ' + str(self.race.attrModifiers)
 		print 'Class: ' + self.charClass.name + ', sp/level = ' + \
-			str(self.charClass.getSkillPointsPerLevel(self.abilities.get('Intelligence').modifier))
+			str(self.charClass.getSkillPointsPerLevel(Abilities.modifier(self.abilities[Abilities.INTELLIGENCE])))
 		print 'Speed: ' + str(self.speed)
 		print 'Abilities:'
 		for name in Abilities.all:
-			print  '  ' + name + ': ' + str(self.abilities.get(name)) + ' / ' + str(self.abilities.get(name).modifier)
-
-p = Character('Letitbi', speed = 30)
-p.randomize()
-p.dump()
-
-print Dice(6).rollAndRemoveWorst(4)
+			print  '  ' + name + ': ' + str(self.abilities[name]) + ' / ' + str(Abilities.modifier(self.abilities[name]))
+		self.equipment.dump()

@@ -4,20 +4,26 @@ import argparse
 import sys
 
 from game import Combat, Monsters, Characters
-
-from pprint import pprint
+from game.Equipment import Equipment
+from game.Characters import Character
 
 FLAGS = None
 
 def main(_):
 	print '-' * 80
 	for weapon in Combat.weapons:
-		print str(weapon)
+		print str(Combat.weapons[weapon])
 	print '-' * 80
 
 	for monster in Monsters.monsters:
 		monster.dump()
 		print '-' * 80
+
+	p = Character('Letitbi', speed = 30)
+	p.randomize()
+	p.equip(Equipment.RIGHT_HAND, Combat.weapons['Dagger'])
+	p.equip(Equipment.LEFT_HAND, Combat.weapons['Glaive'])
+	p.dump()
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
