@@ -1,5 +1,5 @@
 import random
-from game import Abilities, Dice, Roll4AndRemoveWorstStrategy, Combat
+from game import Abilities, Dice, Roll4AndRemoveWorstStrategy
 from Equipment import Equipment
 
 class CharacterClass(object):
@@ -37,20 +37,31 @@ races = [
 	Race('Halfling', attrModifiers = [-2, 2, 0, 0, 0, 0]),
 ]
 
-class Character(object):
-	def __init__(self, name, abilityScores = False, initiative = 1, speed = 1, ac = 1, charClass = False, race = False):
-		self.level = 1
+class Creature(object):
+	def __init__(self, name, abilityScores = False, initiative = 1, ac = 1, hp = 1, firstStrike = False):
 		self.name = name
-		self.ac = ac
-		self.initiative = initiative
 		self.abilities = Abilities(abilityScores)
+		self.initiative = initiative
+		self.ac = ac
+		self.hp = hp
+		self.firstStrike = firstStrike
+
+	@property
+	def isDead(self):
+		return self.hp <= 0
+
+
+class Character(Creature):
+	def __init__(self, name, abilityScores = False, initiative = 1, speed = 1, ac = 1, charClass = False, race = False):
+		super(Character, self).__init__(name, abilityScores = abilityScores, initiative = initiative, ac = ac)
+		self.level = 1
 		self.speed = speed
-		self.charClass = charClass if charClass else random.choice(classes)
+		self.setClass(charClass if charClass else random.choice(classes))
 		self.setRace(race)
 		self.equipment = Equipment()
 
 	def randomize(self):
-		self.charClass = random.choice(classes)
+		self.setClass(random.choice(classes))
 		self.abilities.random(Roll4AndRemoveWorstStrategy())
 		self.setRace(random.choice(races))
 
@@ -59,6 +70,10 @@ class Character(object):
 		if race:
 			for i, name in enumerate(Abilities.all):
 				self.abilities[name] += self.race.attrModifiers[i]
+
+	def setClass(self, charClass):
+		self.charClass = charClass
+		self.hp = charClass.hitDie.faces
 
 	def equip(self, slot, item):
 		if item.minLevel > self.level:
@@ -70,6 +85,7 @@ class Character(object):
 		print 'Race: ' + self.race.name + ', ' + str(self.race.attrModifiers)
 		print 'Class: ' + self.charClass.name + ', sp/level = ' + \
 			str(self.charClass.getSkillPointsPerLevel(Abilities.modifier(self.abilities[Abilities.INTELLIGENCE])))
+		print 'HP: ' + str(self.hp)
 		print 'Speed: ' + str(self.speed)
 		print 'Abilities:'
 		for name in Abilities.all:

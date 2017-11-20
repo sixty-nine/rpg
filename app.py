@@ -15,15 +15,27 @@ def main(_):
 		print str(Combat.weapons[weapon])
 	print '-' * 80
 
-	for monster in Monsters.monsters:
+	for name, monster in Monsters.monsters.iteritems():
 		monster.dump()
 		print '-' * 80
+
+	m = Monsters.monsters['Goblin']
 
 	p = Character('Letitbi', speed = 30)
 	p.randomize()
 	p.equip(Equipment.RIGHT_HAND, Combat.weapons['Dagger'])
 	p.equip(Equipment.LEFT_HAND, Combat.weapons['Glaive'])
 	p.dump()
+
+	#p.attack(m, p.equipment[Equipment.RIGHT_HAND])
+	#p.attack(m, p.equipment[Equipment.LEFT_HAND])
+	#m.attack(p)
+
+	c = Combat.Combat(p, m)
+	while not p.isDead and not m.isDead:
+		c.doRound()
+	print p.name, p.hp
+	print m.name, m.hp
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()

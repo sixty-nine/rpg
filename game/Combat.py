@@ -1,5 +1,6 @@
-from game import Dice
-from Equipment import Weapon
+from game import Dice, Abilities
+from Equipment import Weapon, Equipment
+from Characters import Creature, Character
 
 class Damage(object):
 
@@ -19,6 +20,95 @@ class Damage(object):
 
 	def __str__(self):
 		return '[%(min)s-%(max)s]' % {'min': self.min(), 'max': self.max()}
+
+class Combat(object):
+
+	def __init__(self, attacker, defender):
+		if not isinstance(attacker, Creature):
+			raise ValueError('Attacker must be a creature')
+		if not isinstance(defender, Creature):
+			raise ValueError('Defender must be a creature')
+
+		self.attacker = attacker
+		self.defender = defender
+
+	def order(self):
+		if not self.attacker.firstStrike:
+			if self.defender.firstStrike or self.defender.initiative > self.attacker.initiative:
+				return [self.defender, self.attacker]
+
+		return [self.attacker, self.defender]
+
+	def doRound(self):
+
+		(first, second) = self.order()
+
+		self._attack(first, second)
+		self._attack(second, first)
+
+	def _attack(self, attacker, defender):
+		if attacker.isDead:
+			return
+
+		if isinstance(attacker, Character):
+			if attacker.equipment[Equipment.RIGHT_HAND]:
+				self._doAttack(attacker, defender, attacker.equipment[Equipment.RIGHT_HAND])
+			if not defender.isDead and attacker.equipment[Equipment.LEFT_HAND]:
+				self._doAttack(attacker, defender, attacker.equipment[Equipment.LEFT_HAND])
+		else:
+			self._doAttack(attacker, defender)
+
+	def _doAttack(self, me, other, weapon = None):
+
+		if isinstance(me, Character):
+			if not isinstance(weapon, Weapon):
+				raise ValueError('You can only attack with weapons')
+			ability = Abilities.STRENGTH if not weapon.isRanged else Abilities.DEXTERITY
+			modifier = Abilities.modifier(me.abilities[ability])
+			threatRange = weapon.threatRange
+			damages = weapon.damage
+			criticalDmg = weapon.critical
+		else:
+			modifier = 0
+			threatRange = 20
+			damages = me.damage
+			criticalDmg = 2
+
+		attackRoll = Dice(20).roll()
+		threatRange = threatRange
+		critical = attackRoll >= threatRange
+
+		print '--'
+		print '-- %s attacks %s' % (me.name, other.name)
+
+		print '-- Dice roll: %s + %s = %s' % (attackRoll, modifier, attackRoll + modifier)
+
+		if attackRoll == 1:
+			print '-- Critical miss'
+			return
+
+		attackRoll += modifier
+		touch = attackRoll >= other.ac
+
+		if not touch:
+			print '-- Miss'
+			return
+
+		dmg = damages.calc()
+		totalDmg = dmg + modifier
+		if not critical:
+			print '-- Damage dealt: %s + %s = %s' % (dmg, modifier, totalDmg)
+		else:
+			totalDmg *= criticalDmg
+			print '-- Critical damage dealt: %s * (%s + %s) = %s' % (criticalDmg, dmg, modifier, totalDmg)
+
+		other.hp -= totalDmg
+
+		if other.hp > 0:
+			print '-- %s HP: %s' % (str(other.name), other.hp)
+		else:
+			print '-- %s is dead' % other.name
+
 
 weapons = {
 	'Gauntlet': Weapon('Gauntlet', Damage(2)),
