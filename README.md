@@ -38,9 +38,9 @@
 
 ## Market
 
-MerchandableGood.item
-MerchandableGood.sellPrice
-MerchandableGood.buyPrice
+	MerchandableGood.item
+	MerchandableGood.sellPrice
+	MerchandableGood.buyPrice
 
 # Combat
 
@@ -58,31 +58,31 @@ Sizes modifiers:
 	Diminutive	+4
 	Fine		+8
 
-Abilities = [Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma]
-Abilities.getModifier(value):
-	return math.floor(-5 + x  / 2) 
+	Abilities = [Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma]
+	Abilities.getModifier(value):
+		return math.floor(-5 + x  / 2) 
 
-Attribute.current
-Attribute.max
+	Attribute.current
+	Attribute.max
 
-Fighter.health
-Fighter.abilities
-Fighter.AC():
-	for item in self.equipedItems:
-		if item has AC bonus: 
+	Fighter.health
+	Fighter.abilities
+	Fighter.AC():
+		for item in self.equipedItems:
+			if item has AC bonus: 
 
-Attack.canTouch(oponent):
-	roll = Roll(20)
-	if (roll == 1): return false;
-	if (roll == 20): return critical;
-	else return roll + Abilities.getModifier() >= oponent.AC()
+	Attack.canTouch(oponent):
+		roll = Roll(20)
+		if (roll == 1): return false;
+		if (roll == 20): return critical;
+		else return roll + Abilities.getModifier() >= oponent.AC()
 
 ## Weapon
 
-Weapon.name
-Weapon.description
-Weapon.damage
-Weapon.threat_range = 20, 19, 18
-Weapon.critical = 2
-Weapon.range
-Weapon.weight
+	Weapon.name
+	Weapon.description
+	Weapon.damage
+	Weapon.threat_range = 20, 19, 18
+	Weapon.critical = 2
+	Weapon.range
+	Weapon.weight
