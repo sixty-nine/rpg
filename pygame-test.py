@@ -36,6 +36,7 @@ def main(_):
     clock = pygame.time.Clock()
 
     center = [size[0] // 2, size[1] // 2]
+    screenRect = pygame.Rect(0, 0, size[0], size[1])
 
     myfont = pygame.font.SysFont("monospace", 15)
 
@@ -114,8 +115,11 @@ def main(_):
             G = self.gravityCenter
             v = [self.current.center[0] - G[0], self.current.center[1] - G[1]]
             lv = math.sqrt(v[0] * v[0] + v[1] * v[1])
+            if lv == 0: lv = 1
             v = [math.ceil(2 * v[0] / lv), math.ceil(2 * v[1] / lv)]
             self.current.center = [self.current.center[0] + v[0], self.current.center[1] + v[1]]
+            if not screenRect.contains(self.current):
+                self.current = self.next()
             return True
 
 
