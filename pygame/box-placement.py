@@ -28,8 +28,7 @@ def main(_):
     # Set the height and width of the screen
     size = [1024, 768]
     screen = pygame.display.set_mode(size)
-     
-    pygame.display.set_caption("Example code for the draw module")
+    pygame.display.set_caption("Rectangle placement")
      
     #Loop until the user clicks the close button.
     done = False
