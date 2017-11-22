@@ -12,6 +12,38 @@ def drawCross(screen, point, color, size = 5, width = 1):
     pygame.draw.line(screen, color, [point[0] - size, point[1] - size], [point[0] + size, point[1] + size], width)
     pygame.draw.line(screen, color, [point[0] + size, point[1] - size], [point[0] - size, point[1] + size], width)
 
+def getRandomPointInCircle(radius):
+    t = 2 * math.pi * random.uniform(0, 1)
+    u = random.uniform(0, 1) + random.uniform(0, 1)
+    r = None
+    if u > 1: r = 2 - u
+    else: r = u
+    return [int(radius * r * math.cos(t)), int(radius * r * math.sin(t))]
+
+def create_rects(center, count, minSize = 10, maxSize = 50):
+    rectangles = []
+    for i in xrange(10, count + 10):
+        point = getRandomPointInCircle(i)
+        point = [point[0] + center[0], point[1] + center[1]]
+        w = random.randint(minSize, maxSize)
+        h = random.randint(minSize, maxSize)
+        rect = pygame.Rect((0, 0), (w, h))
+        rect.center = (point[0], point[1])
+        rectangles.append(rect)
+    return rectangles
+
+def create_rects_random(center, count, minSize = 10, maxSize = 50):
+    rectangles = []
+    minSize = 10
+    maxSize = 50
+    for i in xrange(0, 100):
+        x = random.randint(center[0] - maxSize, center[0] + maxSize)
+        y = random.randint(center[1] - maxSize, center[1] + maxSize)
+        w = random.randint(minSize, maxSize)
+        h = random.randint(minSize, maxSize)
+        rectangles.pkl.append(pygame.Rect((x, y), (w, h)))
+    return rectangles
+
 def main(_):
 
     # Initialize the game engine
@@ -35,20 +67,11 @@ def main(_):
     clock = pygame.time.Clock()
 
     center = [size[0] // 2, size[1] // 2]
-    screenRect = pygame.Rect(0, 0, size[0], size[1])
+    screenRect = pygame.Rect(0, 0, size[0], size[1]).inflate(-600, -400)
 
     myfont = pygame.font.SysFont("monospace", 15)
 
-    # Create random rectangles
-    rects = []
-    minSize = 10
-    maxSize = 50
-    for i in xrange(0, 100):
-        x = random.randint(center[0] - maxSize, center[0] + maxSize)
-        y = random.randint(center[1] - maxSize, center[1] + maxSize)
-        w = random.randint(minSize, maxSize)
-        h = random.randint(minSize, maxSize)
-        rects.append(pygame.Rect((x, y), (w, h)))
+    rects = create_rects(center, FLAGS.num_rects)
 
     if FLAGS.save:
         pickle.dump(rects, open('rectangles.pkl', 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
@@ -149,6 +172,8 @@ def main(_):
         # Clear the screen and set the screen background
         screen.fill(WHITE)
 
+        pygame.draw.rect(screen, RED, screenRect, 2)
+
         if FLAGS.anim:
             finder.findNextPlace()
 
@@ -177,7 +202,8 @@ def main(_):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--sort', type=str, default='closest', help='Sort order for the rectangles (closest, biggest, smallest)')
-    parser.add_argument('--grow', type=int, default=0, help='')
+    parser.add_argument('--grow', type=int, default=0, help='Distance between rectangles')
+    parser.add_argument('--num-rects', type=int, default=100, help='Number of rectangles')
     parser.add_argument('--anim', action='store_true', help='Animate')
     parser.add_argument('--save', action='store_true', help='Save the rectangles')
     parser.add_argument('--load', action='store_true', help='Load the rectangles')
