@@ -12,18 +12,36 @@ def drawCross(screen, point, color, size = 5, width = 1):
     pygame.draw.line(screen, color, [point[0] - size, point[1] - size], [point[0] + size, point[1] + size], width)
     pygame.draw.line(screen, color, [point[0] + size, point[1] - size], [point[0] - size, point[1] + size], width)
 
-def getRandomPointInCircle(radius):
+def roundm(n, m):
+    return math.floor(((n + m - 1) / m)) * m
+
+def getRandomPointInCircle(radius, tile_size = 4):
     t = 2 * math.pi * random.uniform(0, 1)
     u = random.uniform(0, 1) + random.uniform(0, 1)
     r = None
     if u > 1: r = 2 - u
     else: r = u
-    return [int(radius * r * math.cos(t)), int(radius * r * math.sin(t))]
+    return [
+        roundm(int(radius * r * math.cos(t)), tile_size),
+        roundm(int(radius * r * math.sin(t)), tile_size)
+    ]
+
+def getRandomPointInEllipse(ellipse_width, ellipse_height, tile_size = 4):
+    t = 2 * math.pi * random.uniform(0, 1)
+    u = random.uniform(0, 1) + random.uniform(0, 1)
+    r = None
+    if u > 1: r = 2-u
+    else: r = u
+    return [
+        roundm(ellipse_width * r * math.cos(t) / 2, tile_size),
+        roundm(ellipse_height * r * math.sin(t) / 2, tile_size)
+    ]
 
 def create_rects(center, count, minSize = 10, maxSize = 50):
     rectangles = []
     for i in xrange(10, count + 10):
-        point = getRandomPointInCircle(i)
+        #point = getRandomPointInCircle(i)
+        point = getRandomPointInEllipse(200, 100)
         point = [point[0] + center[0], point[1] + center[1]]
         w = random.randint(minSize, maxSize)
         h = random.randint(minSize, maxSize)
@@ -72,6 +90,12 @@ def main(_):
     myfont = pygame.font.SysFont("monospace", 15)
 
     rects = create_rects(center, FLAGS.num_rects)
+
+    meanW = reduce((lambda s, r: s + r.width), [0] + rects) / len(rects)
+    meanH = reduce((lambda s, r: s + r.height), [0] + rects) / len(rects)
+
+    for rect in rects:
+        pass
 
     if FLAGS.save:
         pickle.dump(rects, open('rectangles.pkl', 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
@@ -183,7 +207,8 @@ def main(_):
 
         for i, rect in enumerate(finder.drawn + [finder.current]):
             if not rect: continue
-            pygame.draw.rect(screen, BLACK, rect.inflate(-finder.grow, -finder.grow), 1)
+            color = RED if rect.width > meanW and rect.height > meanH else GRAY
+            pygame.draw.rect(screen, color, rect.inflate(-finder.grow, -finder.grow), 1)
             if not FLAGS.no_numbers:
                 label = myfont.render(str(i), 1, RED)
                 screen.blit(label, [rect.center[0] - 6, rect.center[1] -6])
