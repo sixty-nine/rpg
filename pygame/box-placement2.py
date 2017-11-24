@@ -8,6 +8,12 @@ import sys
 
 FLAGS = None
 
+def hex_to_rgb(value):
+    """Return (red, green, blue) for the color given as #rrggbb."""
+    value = value.lstrip('#')
+    lv = len(value)
+    return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
+
 def drawCross(screen, point, color, size = 5, width = 1):
     pygame.draw.line(screen, color, [point[0] - size, point[1] - size], [point[0] + size, point[1] + size], width)
     pygame.draw.line(screen, color, [point[0] + size, point[1] - size], [point[0] - size, point[1] + size], width)
@@ -196,7 +202,7 @@ def main(_):
         # Clear the screen and set the screen background
         screen.fill(WHITE)
 
-        pygame.draw.rect(screen, RED, screenRect, 2)
+        pygame.draw.rect(screen, hex_to_rgb('#ff0000'), screenRect, 2)
 
         if FLAGS.anim:
             finder.findNextPlace()
@@ -205,17 +211,30 @@ def main(_):
             if not rect: continue
             pygame.draw.rect(screen, GRAY, rect, 1)
 
+        centers = [] # For Delaunay triangulation
+
         for i, rect in enumerate(finder.drawn + [finder.current]):
             if not rect: continue
-            color = RED if rect.width > meanW and rect.height > meanH else GRAY
+            centers.append(rect.center)
+            color = hex_to_rgb('#ff0000') if rect.width > meanW and rect.height > meanH else GRAY
             pygame.draw.rect(screen, color, rect.inflate(-finder.grow, -finder.grow), 1)
             if not FLAGS.no_numbers:
-                label = myfont.render(str(i), 1, RED)
+                label = myfont.render(str(i), 1, hex_to_rgb('#ff0000'))
                 screen.blit(label, [rect.center[0] - 6, rect.center[1] -6])
 
         if FLAGS.centers:
             drawCross(screen, finder.gravityCenter, BLUE, width = 2)
-            drawCross(screen, center, RED, width = 2)
+            drawCross(screen, center, hex_to_rgb('#ff0000'), width = 2)
+
+        # Delaunay triangulation
+        if len(centers) > 3:
+            from scipy.spatial import Delaunay
+            import numpy as np
+            points = np.array(centers)
+            tri = Delaunay(points)
+
+            for simplex in tri.simplices:
+                pygame.draw.lines(screen, hex_to_rgb('#9a9a9a'), True, points[simplex], 1)
 
         # Go ahead and update the screen with what we've drawn.
         # This MUST happen after all the other drawing commands.
