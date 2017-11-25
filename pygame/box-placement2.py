@@ -5,6 +5,10 @@ import random
 import cPickle as pickle
 import argparse
 import sys
+import scipy
+from scipy.spatial import Delaunay
+from scipy.sparse.csgraph import minimum_spanning_tree
+import numpy as np
 
 FLAGS = None
 
@@ -215,8 +219,10 @@ def main(_):
 
         for i, rect in enumerate(finder.drawn + [finder.current]):
             if not rect: continue
-            centers.append(rect.center)
-            color = hex_to_rgb('#ff0000') if rect.width > meanW and rect.height > meanH else GRAY
+            color = GRAY
+            if rect.width > meanW and rect.height > meanH:
+                color = hex_to_rgb('#ff0000')
+                centers.append(rect.center)
             pygame.draw.rect(screen, color, rect.inflate(-finder.grow, -finder.grow), 1)
             if not FLAGS.no_numbers:
                 label = myfont.render(str(i), 1, hex_to_rgb('#ff0000'))
@@ -228,13 +234,24 @@ def main(_):
 
         # Delaunay triangulation
         if len(centers) > 3:
-            from scipy.spatial import Delaunay
-            import numpy as np
             points = np.array(centers)
             tri = Delaunay(points)
 
+            graph = np.zeros((len(points), len(points)))
+
             for simplex in tri.simplices:
+                graph[simplex[0], simplex[1]] = 1
+                graph[simplex[1], simplex[2]] = 1
+                graph[simplex[2], simplex[0]] = 1
                 pygame.draw.lines(screen, hex_to_rgb('#9a9a9a'), True, points[simplex], 1)
+
+            # Spanning Tree
+            tree = minimum_spanning_tree(graph)
+            a = scipy.sparse.find(tree)[0]
+            b = scipy.sparse.find(tree)[1]
+            for j in xrange(0, len(a)):
+                pygame.draw.line(screen, hex_to_rgb('#333333'), points[a[j]], points[b[j]], 2)
+
 
         # Go ahead and update the screen with what we've drawn.
         # This MUST happen after all the other drawing commands.
