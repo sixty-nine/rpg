@@ -170,6 +170,10 @@ def main(_):
                 return True
             G = self.gravityCenter
             v = [self.current.center[0] - G[0], self.current.center[1] - G[1]]
+
+            if (np.zeros(2, dtype=int) == v).all(): # if v == [0, 0]
+                v = np.ones(2)
+
             lv = math.sqrt(v[0] * v[0] + v[1] * v[1])
             if lv == 0: lv = 1
             v = [math.ceil(2 * v[0] / lv), math.ceil(2 * v[1] / lv)]
@@ -252,6 +256,7 @@ def main(_):
             tree = minimum_spanning_tree(graph)
             a = scipy.sparse.find(tree)[0]
             b = scipy.sparse.find(tree)[1]
+
             if not FLAGS.no_tree:
                 for j in xrange(0, len(a)):
                     pygame.draw.line(screen, hex_to_rgb('#333333'), points[a[j]], points[b[j]], 2)
