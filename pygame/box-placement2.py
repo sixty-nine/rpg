@@ -95,7 +95,7 @@ def main(_):
     clock = pygame.time.Clock()
 
     center = [size[0] // 2, size[1] // 2]
-    screenRect = pygame.Rect(0, 0, size[0], size[1]).inflate(-600, -400)
+    screenRect = pygame.Rect(0, 0, size[0], size[1]).inflate(-400, -300)
 
     myfont = pygame.font.SysFont("monospace", 15)
 
@@ -223,6 +223,8 @@ def main(_):
             if rect.width > meanW and rect.height > meanH:
                 color = hex_to_rgb('#ff0000')
                 centers.append(rect.center)
+            else:
+                continue
             pygame.draw.rect(screen, color, rect.inflate(-finder.grow, -finder.grow), 1)
             if not FLAGS.no_numbers:
                 label = myfont.render(str(i), 1, hex_to_rgb('#ff0000'))
@@ -240,17 +242,19 @@ def main(_):
             graph = np.zeros((len(points), len(points)))
 
             for simplex in tri.simplices:
-                graph[simplex[0], simplex[1]] = 1
-                graph[simplex[1], simplex[2]] = 1
-                graph[simplex[2], simplex[0]] = 1
-                pygame.draw.lines(screen, hex_to_rgb('#9a9a9a'), True, points[simplex], 1)
+                graph[simplex[0], simplex[1]] = scipy.spatial.distance.euclidean(points[simplex[0]], points[simplex[1]])
+                graph[simplex[1], simplex[2]] = scipy.spatial.distance.euclidean(points[simplex[1]], points[simplex[2]])
+                graph[simplex[2], simplex[0]] = scipy.spatial.distance.euclidean(points[simplex[2]], points[simplex[0]])
+                if not FLAGS.no_tri:
+                    pygame.draw.lines(screen, hex_to_rgb('#cdcdcd'), True, points[simplex], 1)
 
             # Spanning Tree
             tree = minimum_spanning_tree(graph)
             a = scipy.sparse.find(tree)[0]
             b = scipy.sparse.find(tree)[1]
-            for j in xrange(0, len(a)):
-                pygame.draw.line(screen, hex_to_rgb('#333333'), points[a[j]], points[b[j]], 2)
+            if not FLAGS.no_tree:
+                for j in xrange(0, len(a)):
+                    pygame.draw.line(screen, hex_to_rgb('#333333'), points[a[j]], points[b[j]], 2)
 
 
         # Go ahead and update the screen with what we've drawn.
@@ -271,5 +275,8 @@ if __name__ == '__main__':
     parser.add_argument('--no-numbers', action='store_true', help='Don\'t display rectangles numbers')
     parser.add_argument('--centers', action='store_true', help='Display the center and gravity center')
     parser.add_argument('--gc-current', action='store_true', help='Use the current rectangle to calculate the gravity center')
+    parser.add_argument('--no-tri', action='store_true', help='Don\'t display triangulation')
+    parser.add_argument('--no-tree', action='store_true', help='Don\'t display spanning tree')
+
     FLAGS, unparsed = parser.parse_known_args()
     main([sys.argv[0]] + unparsed)
