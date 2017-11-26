@@ -1,11 +1,11 @@
 #!/usr/local/bin/python
 
 from __future__ import print_function
-from map import Rooms, Room
+from map import Map, Room
 from map.placement import PlaceFinder, DefaultGravityCenterStrategy
 from scipy.spatial import distance
 
-r = Rooms()
+r = Map()
 r.graph.add_node(Room([5, 5], [5, 5]))
 r.graph.add_node(Room([20, 10], [15, 10]))
 r.graph.add_node(Room([10, 30], [15, 15]))
@@ -16,7 +16,7 @@ r.graph.add_node(Room([55, 15], [8, 8]))
 r.graph.nodes = sorted(r.graph.nodes, key = lambda r: distance.euclidean([20, 25], r.center))
 print('-->', [n.id for n in r.graph.nodes])
 
-# r = Rooms.random([20, 25], 9, width = 40, height = 45, minSize = 5, maxSize = 8)
+# r = Map.random([20, 25], 9, width = 40, height = 45, minSize = 5, maxSize = 8)
 
 # finder = PlaceFinder(r.graph.nodes, DefaultGravityCenterStrategy(), 3)
 # finder.find()

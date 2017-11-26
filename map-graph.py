@@ -3,8 +3,8 @@
 import pygame
 import argparse
 import sys
-from map import Rooms, Room
-from map.placement import PlaceFinder, DefaultGravityCenterStrategy
+from map import Map, Room
+from map.Placement import PlaceFinder, DefaultGravityCenterStrategy
 from scipy.spatial import distance
 
 FLAGS = None
@@ -34,8 +34,8 @@ def main(_):
     clock = pygame.time.Clock()
 
     def create_rooms():
-        r = Rooms()
-        r.graph.add_node(Room([5, 5], [5, 5], is_main = True))
+        r = Map()
+        r.graph.add_node(Room([5, 5], [5, 5]))
         r.graph.add_node(Room([20, 10], [15, 10]))
         r.graph.add_node(Room([10, 30], [15, 15]))
         r.graph.add_node(Room([40, 30], [15, 15]))
@@ -44,7 +44,7 @@ def main(_):
         return r
 
     def create_rooms_2():
-        r = Rooms.random([50, 50], 20, width = 40, height = 45, minSize = 6, maxSize = 12)
+        r = Map.random([50, 50], 20, width = 40, height = 45, minSize = 6, maxSize = 12)
 
         finder = PlaceFinder(r.graph.nodes, DefaultGravityCenterStrategy(), 5)
         finder.find()
