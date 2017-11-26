@@ -24,26 +24,29 @@ class Graph(object):
         ensure(to_room >= 0 and to_room < len(self.nodes), 'to_room out of bounds')
         self.connections[from_room, to_room] = distance.euclidean(self.nodes[from_room].center, self.nodes[to_room].center)
 
+    def is_connected(self, from_room, to_room):
+        ensure(from_room >= 0 and from_room < len(self.nodes), 'from_room out of bounds')
+        ensure(to_room >= 0 and to_room < len(self.nodes), 'to_room out of bounds')
+        return self.connections[from_room, to_room] != 0
+
     def triangulate(self):
-        l = len(self.nodes)
-        ensure(l >= 4, 'Cannot triangulate with less than four rooms')
+        ensure(len(self.nodes) >= 4, 'Cannot triangulate with less than four rooms')
         self.reset_connections()
-        points = [n.center for n in self.nodes if n.is_main]
         points = []
-        lookup = []
+        self.lookup = []
         i = 0
         for n in self.nodes:
             if n.is_main:
                 points.append(n.center)
-                lookup.append(n.id)
+                self.lookup.append(n.id)
             i += 1
 
         tri = Delaunay(points)
 
         for simplex in tri.simplices:
-            self.add_connection(lookup[simplex[0]], lookup[simplex[1]])
-            self.add_connection(lookup[simplex[1]], lookup[simplex[2]])
-            self.add_connection(lookup[simplex[2]], lookup[simplex[0]])
+            self.add_connection(self.lookup[simplex[0]], self.lookup[simplex[1]])
+            self.add_connection(self.lookup[simplex[1]], self.lookup[simplex[2]])
+            self.add_connection(self.lookup[simplex[2]], self.lookup[simplex[0]])
 
         self.triangulation = tri
 
@@ -58,10 +61,16 @@ class Graph(object):
         rnd_count = int(s_count * 3 * percentage)
         rnd = s_count * np.random.rand(rnd_count)
         rnd = rnd.astype(int)
-        for rn in rnd:
+        counter = 0
+        cur_try = 0
+        while counter < len(rnd) and cur_try < s_count:
+            cur_try += 1
+            rn = rnd[counter]
             s = self.triangulation.simplices[rn]
             ri = random.randint(0, 2)
             i = s[ri]
             j = s[ri + 1] if ri < 2 else s[0]
-            self.add_connection(i, j)
+            if not self.is_connected(self.lookup[i], self.lookup[j]):
+                self.add_connection(self.lookup[i], self.lookup[j])
+                counter += 1
 

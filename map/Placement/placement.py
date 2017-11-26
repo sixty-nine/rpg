@@ -52,7 +52,7 @@ class PlaceFinder(object):
         self.current.center = [int(self.current.center[0] + v[0]), int(self.current.center[1] + v[1])]
         self.current.setup()
         if self.current.x1 <= 0 or self.current.y1 <= 0:
-            self.is_main = False
+            self.current.is_main = False
             self.current = self.next()
         return True
     def find(self):

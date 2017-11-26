@@ -19,11 +19,11 @@ class Room(object):
     def collides(self, other):
         return self.collides_h(other) and self.collides_v(other)
 
-    def collides_h(self, other):
-        return (self.x1 <= other.x2 and other.x1 <= self.x2)
+    def collides_h(self, other, padding = 0):
+        return (self.x1 + padding <= other.x2 and other.x1 <= self.x2 - padding)
 
-    def collides_v(self, other):
-        return (self.y1 <= other.y2 and other.y1 <= self.y2)
+    def collides_v(self, other, padding = 0):
+        return (self.y1 + padding <= other.y2 and other.y1 <= self.y2 - padding)
 
     def collides_all(self, others):
         collisions = []

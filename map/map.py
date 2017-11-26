@@ -36,23 +36,5 @@ class Map(object):
         for i,j,v in zip(cx.row, cx.col, cx.data):
             from_room = self.graph.nodes[i]
             to_room = self.graph.nodes[j]
-
-            if from_room.collides_h(to_room):
-                mid = (max(from_room.x1, to_room.x1) + min(from_room.x2, to_room.x2)) // 2
-                r = xrange(min(from_room.y2, to_room.y2), max(from_room.y1, to_room.y1))
-                the_grid.draw_corridor_h(mid, r)
-            elif from_room.collides_v(to_room):
-                mid = (max(from_room.y1, to_room.y1) + min(from_room.y2, to_room.y2)) // 2
-                r = xrange(min(from_room.x2, to_room.x2), max(from_room.x1, to_room.x1))
-                the_grid.draw_corridor_v(mid, r)
-            else:
-                f = from_room
-                t = to_room
-                mid_x = (f.x1 + f.x2) // 2
-                mid_y = (t.y1 + t.y2) // 2
-                rx = xrange(mid_x, t.x1) if mid_x < t.x1 else xrange(t.x2, mid_x + 1)
-                ry = xrange(mid_y, f.y1) if mid_y < f.y1 else xrange(f.y2, mid_y)
-                the_grid.draw_corridor_h(mid_x, ry)
-                the_grid.draw_corridor_v(mid_y, rx)
-
+            the_grid.connect(from_room, to_room)
         return the_grid

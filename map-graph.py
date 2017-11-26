@@ -35,7 +35,7 @@ def main(_):
 
     def create_rooms():
         r = Map()
-        r.graph.add_node(Room([5, 5], [5, 5]))
+        r.graph.add_node(Room([4, 4], [6, 6]))
         r.graph.add_node(Room([20, 10], [15, 10]))
         r.graph.add_node(Room([10, 30], [15, 15]))
         r.graph.add_node(Room([40, 30], [15, 15]))
@@ -69,19 +69,20 @@ def main(_):
                     r = create_rooms_2()
                     r.graph.triangulate()
                     r.graph.spanning_tree()
-                    r.graph.random_edges(0.1)
+                    r.graph.random_edges(0.05)
 
         # Clear the screen and set the screen background
         screen.fill(WHITE)
 
 
-        size = 8
-        for y, row in enumerate(r.grid.grid.transpose()):
+        size = 6
+        for y, row in enumerate(r.grid.grid):
             x = 0
             for v in row:
                 x += 1
                 if v == -1: continue
-                screen.fill(BLACK, (x * size, y * size, size - 1, size - 1))
+                color = RED if v == -2 else BLACK
+                screen.fill(color, (x * size, y * size, size - 1, size - 1))
 
 
         # Go ahead and update the screen with what we've drawn.
