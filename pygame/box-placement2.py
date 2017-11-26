@@ -154,10 +154,6 @@ def main(_):
         @property
         def gravityCenter(self):
             return self.gcStrategy.getCenter(self)
-            l = len(self.drawn)
-            xs = map(lambda r: r.center[0], self.drawn)
-            ys = map(lambda r: r.center[1], self.drawn)
-            return [sum(xs) // l, sum(ys) // l]
         def next(self):
             return self.toDraw.pop(0) if self.toDraw else None
         def findNextPlace(self):
