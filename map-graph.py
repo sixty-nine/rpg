@@ -44,9 +44,9 @@ def main(_):
         return r
 
     def create_rooms_2():
-        r = Map.random([50, 50], 20, width = 40, height = 45, minSize = 6, maxSize = 12)
+        r = Map.random([70, 70], 200, width = 10, height = 15, minSize = 4, maxSize = 12)
 
-        finder = PlaceFinder(r.graph.nodes, DefaultGravityCenterStrategy(), 5)
+        finder = PlaceFinder(r.graph.nodes, DefaultGravityCenterStrategy(), 0)
         finder.find()
         return r
 
@@ -67,6 +67,7 @@ def main(_):
                     done = True # Flag that we are done so we exit this loop
                 if event.key == 114:
                     r = create_rooms_2()
+                    r.graph.reduce()
                     r.graph.triangulate()
                     r.graph.spanning_tree()
                     r.graph.random_edges(0.05)
@@ -75,13 +76,18 @@ def main(_):
         screen.fill(WHITE)
 
 
-        size = 6
+        size = 5
         for y, row in enumerate(r.grid.grid):
             x = 0
             for v in row:
                 x += 1
+
                 if v == -1: continue
-                color = RED if v == -2 else BLACK
+
+                if v == -2: color = GRAY
+                elif v == -3: color = BLACK
+                else: color = RED
+
                 screen.fill(color, (x * size, y * size, size - 1, size - 1))
 
 

@@ -27,14 +27,17 @@ class Map(object):
     def grid(self):
 
         the_grid = Grid(self.graph)
+        sec_rooms = []
 
         for room in self.graph.nodes:
             if room.is_main:
                 the_grid.draw_room(room)
+            elif room.is_visible:
+                sec_rooms.append(room)
 
         cx = scipy.sparse.coo_matrix(self.graph.connections)
         for i,j,v in zip(cx.row, cx.col, cx.data):
             from_room = self.graph.nodes[i]
             to_room = self.graph.nodes[j]
-            the_grid.connect(from_room, to_room)
+            the_grid.connect(from_room, to_room, sec_rooms)
         return the_grid

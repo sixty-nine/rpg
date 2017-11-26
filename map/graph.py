@@ -29,6 +29,14 @@ class Graph(object):
         ensure(to_room >= 0 and to_room < len(self.nodes), 'to_room out of bounds')
         return self.connections[from_room, to_room] != 0
 
+    def reduce(self):
+        l = len(self.nodes)
+        meanW = reduce((lambda s, r: s + r.size[0]), [0] + self.nodes) / l
+        meanH = reduce((lambda s, r: s + r.size[1]), [0] + self.nodes) / l
+        for n in self.nodes:
+            if n.size[0] < meanW or n.size[1] < meanH:
+                n.is_main = False
+
     def triangulate(self):
         ensure(len(self.nodes) >= 4, 'Cannot triangulate with less than four rooms')
         self.reset_connections()
@@ -53,7 +61,6 @@ class Graph(object):
     def spanning_tree(self):
         if not self.triangulation: self.triangulate()
         self.connections = lil_matrix(minimum_spanning_tree(self.connections))
-
 
     def random_edges(self, percentage):
         ensure(self.triangulation, 'You must triangulate before creating random edges')

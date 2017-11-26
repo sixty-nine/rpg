@@ -1,7 +1,8 @@
 class Room(object):
     cur_id = 0
-    def __init__(self, center = [0, 0], size = [0, 0], is_main = True):
+    def __init__(self, center = [0, 0], size = [0, 0], is_main = True, is_visible = True):
         self.id = Room.cur_id
+        self.is_visible = is_visible
         self.is_main = is_main
         Room.cur_id += 1
         self.center = center
@@ -15,6 +16,7 @@ class Room(object):
         self.y1 = self.center[1] - half_y
         self.x2 = self.center[0] + half_x
         self.y2 = self.center[1] + half_y
+        self.is_main = self.is_main and self.is_visible
 
     def collides(self, other):
         return self.collides_h(other) and self.collides_v(other)

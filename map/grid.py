@@ -1,4 +1,5 @@
 import numpy as np
+from rooms import Room
 
 class Grid(object):
     def __init__(self, graph):
@@ -8,28 +9,34 @@ class Grid(object):
         self.grid = np.zeros((max_x, max_y), dtype=int)
         self.grid.fill(-1)
 
-    def draw_room(self, room):
+    def draw_room(self, room, value = None):
         for i in xrange(room.x1, room.x2):
             for j in xrange(room.y1, room.y2):
-                self.grid[i, j] = room.id
+                self.grid[i, j] = room.id if value is None else value
 
-    def draw_line_h(self, x, range_v):
+    def draw_line_h(self, x, range_v, secondary_rooms = []):
         for y in range_v:
             self.grid[x, y] = -2
+            r = Room([x, y], [1, 1])
+            for o in r.collides_all(secondary_rooms):
+                self.draw_room(o, -3)
 
-    def draw_line_v(self, y, range_h):
+    def draw_line_v(self, y, range_h, secondary_rooms = []):
         for x in range_h:
             self.grid[x, y] = -2
+            r = Room([x, y], [1, 1])
+            for o in r.collides_all(secondary_rooms):
+                self.draw_room(o, -3)
 
-    def connect(self, from_room, to_room):
+    def connect(self, from_room, to_room, secondary_rooms = []):
         if from_room.collides_h(to_room, 3):
             mid = (max(from_room.x1, to_room.x1) + min(from_room.x2, to_room.x2)) // 2
             r = xrange(min(from_room.y2, to_room.y2), max(from_room.y1, to_room.y1))
-            self.draw_line_h(mid, r)
+            self.draw_line_h(mid, r, secondary_rooms)
         elif from_room.collides_v(to_room, 3):
             mid = (max(from_room.y1, to_room.y1) + min(from_room.y2, to_room.y2)) // 2
             r = xrange(min(from_room.x2, to_room.x2), max(from_room.x1, to_room.x1))
-            self.draw_line_v(mid, r)
+            self.draw_line_v(mid, r, secondary_rooms)
         else:
             f = from_room
             t = to_room
@@ -37,5 +44,5 @@ class Grid(object):
             mid_y = (t.y1 + t.y2) // 2
             rx = xrange(mid_x, t.x1) if mid_x < t.x1 else xrange(t.x2, mid_x + 1)
             ry = xrange(mid_y, f.y1) if mid_y < f.y1 else xrange(f.y2, mid_y)
-            self.draw_line_h(mid_x, ry)
-            self.draw_line_v(mid_y, rx)
+            self.draw_line_h(mid_x, ry, secondary_rooms)
+            self.draw_line_v(mid_y, rx, secondary_rooms)
