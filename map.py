@@ -2,7 +2,7 @@
 
 from __future__ import print_function
 from map import Map, Room
-from map.placement import PlaceFinder, DefaultGravityCenterStrategy
+from map.Placement import PlaceFinder, DefaultGravityCenterStrategy
 from scipy.spatial import distance
 
 r = Map()
