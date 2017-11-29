@@ -1,32 +1,51 @@
 import numpy as np
 from objects import Rectangle
+from utils import hex_to_rgb
+
+class Cell(object):
+    def __init__(self, color = '#000000', is_walkable = False, reference = None):
+        self.is_walkable = is_walkable
+        self.color = color
+        self.reference = reference
+
 
 class Grid(object):
     def __init__(self, graph):
+
+        self.cells = []
+        self.wall = self.create_cell()
+        self.hallway = self.create_cell('#cdcdcd', True)
+
         max_x = max([r.x2 for r in graph.nodes])
         max_y = max([r.y2 for r in graph.nodes])
 
         self.grid = np.zeros((max_x, max_y), dtype=int)
-        self.grid.fill(-1)
+        self.grid.fill(self.wall)
 
-    def draw_room(self, room, value = None):
+    def create_cell(self, color = '#000000', is_walkable = False, reference = None):
+        self.cells.append(Cell(color, is_walkable, reference))
+        return len(self.cells) - 1
+
+    def draw_room(self, room, color = '#000000'):
+        idx = self.create_cell(color, True, room)
+
         for i in xrange(room.x1, room.x2):
             for j in xrange(room.y1, room.y2):
-                self.grid[i, j] = room.id if value is None else value
+                self.grid[i, j] = idx
 
     def draw_line_h(self, x, range_v, secondary_rooms = []):
         for y in range_v:
-            self.grid[x, y] = -2
+            self.grid[x, y] = self.hallway
             r = Rectangle([x, y], [1, 1])
             for o in r.collides_all(secondary_rooms):
-                self.draw_room(o, -3)
+                self.draw_room(o, '#ababab')
 
     def draw_line_v(self, y, range_h, secondary_rooms = []):
         for x in range_h:
-            self.grid[x, y] = -2
+            self.grid[x, y] = self.hallway
             r = Rectangle([x, y], [1, 1])
             for o in r.collides_all(secondary_rooms):
-                self.draw_room(o, -3)
+                self.draw_room(o, '#ababab')
 
     def connect(self, from_room, to_room, secondary_rooms = []):
         if from_room.collides_h(to_room, 3):

@@ -6,6 +6,7 @@ import sys
 from map import Map, Rectangle
 from map.Placement import PlaceFinder, DefaultGravityCenterStrategy
 from scipy.spatial import distance
+from map.utils import hex_to_rgb
 
 FLAGS = None
 
@@ -82,14 +83,10 @@ def main(_):
             for v in row:
                 x += 1
 
-                if v == -1: continue
-
-                if v == -2: color = GRAY
-                elif v == -3: color = BLACK
-                else: color = RED
-
-                screen.fill(color, (x * size, y * size, size - 1, size - 1))
-
+                cell = r.grid.cells[v]
+                color = cell.color
+                # color = cell.color if not cell.is_walkable else '#ffffff'
+                screen.fill(hex_to_rgb(color), (x * size, y * size, size - 1, size - 1))
 
         # Go ahead and update the screen with what we've drawn.
         # This MUST happen after all the other drawing commands.
