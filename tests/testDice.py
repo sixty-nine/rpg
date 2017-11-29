@@ -23,6 +23,6 @@ class DiceTestCase(unittest.TestCase):
 		for i in xrange(2, 100):
 			d = Dice(6)
 			res = d.rollAndRemoveWorst(i)
-			self.assertEquals(i - 1, len(res))
-			self.assertGreaterEqual(sum(res), i)
+			self.assertEquals(i - 1, len(res), 'Not enough results, expected %s, got %s, with %s' % (i - 1, len(res), res))
+			self.assertGreaterEqual(sum(res), i - 1, 'Expected %s to be greater than %s, with %s' % (sum(res), i - 1, res))
 			self.assertLessEqual(sum(res), 6 * i)
