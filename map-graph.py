@@ -3,7 +3,7 @@
 import pygame
 import argparse
 import sys
-from map import Map, Room
+from map import Map, Rectangle
 from map.Placement import PlaceFinder, DefaultGravityCenterStrategy
 from scipy.spatial import distance
 
@@ -33,24 +33,24 @@ def main(_):
     done = False
     clock = pygame.time.Clock()
 
-    def create_rooms():
+    def create_Rectangles():
         r = Map()
-        r.graph.add_node(Room([4, 4], [6, 6]))
-        r.graph.add_node(Room([20, 10], [15, 10]))
-        r.graph.add_node(Room([10, 30], [15, 15]))
-        r.graph.add_node(Room([40, 30], [15, 15]))
-        r.graph.add_node(Room([40, 5], [10, 8]))
-        r.graph.add_node(Room([55, 15], [8, 8]))
+        r.graph.add_node(Rectangle([4, 4], [6, 6]))
+        r.graph.add_node(Rectangle([20, 10], [15, 10]))
+        r.graph.add_node(Rectangle([10, 30], [15, 15]))
+        r.graph.add_node(Rectangle([40, 30], [15, 15]))
+        r.graph.add_node(Rectangle([40, 5], [10, 8]))
+        r.graph.add_node(Rectangle([55, 15], [8, 8]))
         return r
 
-    def create_rooms_2():
+    def create_Rectangles_2():
         r = Map.random([70, 70], 200, width = 10, height = 15, minSize = 4, maxSize = 12)
 
         finder = PlaceFinder(r.graph.nodes, DefaultGravityCenterStrategy(), 0)
         finder.find()
         return r
 
-    r = create_rooms()
+    r = create_Rectangles()
     r.graph.triangulate()
     r.graph.spanning_tree()
     #r.graph.random_edges(0.1)
@@ -66,7 +66,7 @@ def main(_):
                 if event.key == 27 or event.key == 113:
                     done = True # Flag that we are done so we exit this loop
                 if event.key == 114:
-                    r = create_rooms_2()
+                    r = create_Rectangles_2()
                     r.graph.reduce()
                     r.graph.triangulate()
                     r.graph.spanning_tree()

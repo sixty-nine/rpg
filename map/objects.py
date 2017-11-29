@@ -1,10 +1,10 @@
-class Room(object):
+class Rectangle(object):
     cur_id = 0
     def __init__(self, center = [0, 0], size = [0, 0], is_main = True, is_visible = True):
-        self.id = Room.cur_id
+        self.id = Rectangle.cur_id
         self.is_visible = is_visible
         self.is_main = is_main
-        Room.cur_id += 1
+        Rectangle.cur_id += 1
         self.center = center
         self.size = size
         self.setup()

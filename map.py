@@ -1,17 +1,17 @@
 #!/usr/local/bin/python
 
 from __future__ import print_function
-from map import Map, Room
+from map import Map, Rectangle
 from map.Placement import PlaceFinder, DefaultGravityCenterStrategy
 from scipy.spatial import distance
 
 r = Map()
-r.graph.add_node(Room([5, 5], [5, 5]))
-r.graph.add_node(Room([20, 10], [15, 10]))
-r.graph.add_node(Room([10, 30], [15, 15]))
-r.graph.add_node(Room([40, 30], [15, 15]))
-r.graph.add_node(Room([40, 5], [10, 10]))
-r.graph.add_node(Room([55, 15], [8, 8]))
+r.graph.add_node(Rectangle([5, 5], [5, 5]))
+r.graph.add_node(Rectangle([20, 10], [15, 10]))
+r.graph.add_node(Rectangle([10, 30], [15, 15]))
+r.graph.add_node(Rectangle([40, 30], [15, 15]))
+r.graph.add_node(Rectangle([40, 5], [10, 10]))
+r.graph.add_node(Rectangle([55, 15], [8, 8]))
 
 r.graph.nodes = sorted(r.graph.nodes, key = lambda r: distance.euclidean([20, 25], r.center))
 print('-->', [n.id for n in r.graph.nodes])
@@ -27,8 +27,8 @@ print('-->', [n.id for n in r.graph.nodes])
 r.graph.triangulate()
 
 print('-' * 50)
-for i, room in enumerate(r.graph.nodes):
-    print('R(%s): %s, %s' % (i, room, room.xy))
+for i, Rectangle in enumerate(r.graph.nodes):
+    print('R(%s): %s, %s' % (i, Rectangle, Rectangle.xy))
 #print(r.centers)
 #print(r.centers.reshape(-1, 2))
 #print(r.graph)

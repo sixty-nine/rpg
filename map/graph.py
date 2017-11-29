@@ -30,6 +30,9 @@ class Graph(object):
         return self.connections[from_room, to_room] != 0
 
     def reduce(self):
+        """
+        Mark the rooms smaller than the medium size as secondary
+        """
         l = len(self.nodes)
         meanW = reduce((lambda s, r: s + r.size[0]), [0] + self.nodes) / l
         meanH = reduce((lambda s, r: s + r.size[1]), [0] + self.nodes) / l

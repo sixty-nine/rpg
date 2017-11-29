@@ -1,5 +1,5 @@
 import numpy as np
-from rooms import Room
+from objects import Rectangle
 
 class Grid(object):
     def __init__(self, graph):
@@ -17,14 +17,14 @@ class Grid(object):
     def draw_line_h(self, x, range_v, secondary_rooms = []):
         for y in range_v:
             self.grid[x, y] = -2
-            r = Room([x, y], [1, 1])
+            r = Rectangle([x, y], [1, 1])
             for o in r.collides_all(secondary_rooms):
                 self.draw_room(o, -3)
 
     def draw_line_v(self, y, range_h, secondary_rooms = []):
         for x in range_h:
             self.grid[x, y] = -2
-            r = Room([x, y], [1, 1])
+            r = Rectangle([x, y], [1, 1])
             for o in r.collides_all(secondary_rooms):
                 self.draw_room(o, -3)
 

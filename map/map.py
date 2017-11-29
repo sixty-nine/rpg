@@ -2,14 +2,14 @@ import random
 import scipy
 import numpy as np
 from my_random import getRandomPointInEllipse
-from rooms import Room
+from objects import Rectangle
 from graph import Graph
 from grid import Grid
 
 class Map(object):
 
     def __init__(self):
-        Room.cur_id = 0
+        Rectangle.cur_id = 0
         self.graph = Graph()
 
     @staticmethod
@@ -20,7 +20,7 @@ class Map(object):
             point = [int(point[0]) + center[0], int(point[1]) + center[1]]
             w = random.randint(minSize, maxSize)
             h = random.randint(minSize, maxSize)
-            rooms.graph.add_node(Room(point, [w, h]))
+            rooms.graph.add_node(Rectangle(point, [w, h]))
         return rooms
 
     @property
