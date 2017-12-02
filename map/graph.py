@@ -1,6 +1,6 @@
 import random
 import numpy as np
-from scipy.sparse import lil_matrix
+from scipy.sparse import lil_matrix, coo_matrix
 from scipy.spatial import Delaunay, distance
 from scipy.sparse.csgraph import minimum_spanning_tree
 from utils import ensure
@@ -29,6 +29,12 @@ class Graph(object):
         ensure(to_room >= 0 and to_room < len(self.nodes), 'to_room out of bounds')
         return self.connections[from_room, to_room] != 0
 
+    @property
+    def connections_it(self):
+        cx = coo_matrix(self.connections)
+        for i, j, v in zip(cx.row, cx.col, cx.data):
+            yield ((i, j, v))
+
     def reduce(self):
         """
         Mark the rooms smaller than the medium size as secondary
@@ -36,9 +42,8 @@ class Graph(object):
         l = len(self.nodes)
         meanW = reduce((lambda s, r: s + r.size[0]), [0] + self.nodes) / l
         meanH = reduce((lambda s, r: s + r.size[1]), [0] + self.nodes) / l
-        for n in self.nodes:
-            if n.size[0] < meanW or n.size[1] < meanH:
-                n.is_main = False
+
+        self.nodes = [x for x in self.nodes if x.size[0] >= meanW and x.size[1] >= meanH]
 
     def triangulate(self):
         ensure(len(self.nodes) >= 4, 'Cannot triangulate with less than four rooms')
@@ -46,10 +51,9 @@ class Graph(object):
         points = []
         self.lookup = []
         i = 0
-        for n in self.nodes:
-            if n.is_main:
-                points.append(n.center)
-                self.lookup.append(n.id)
+        for id, n in enumerate(self.nodes):
+            points.append(n.center)
+            self.lookup.append(id)
             i += 1
 
         tri = Delaunay(points)
