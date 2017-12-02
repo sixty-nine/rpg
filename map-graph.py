@@ -45,7 +45,7 @@ def main(_):
         return r
 
     def create_Rectangles_2():
-        r = Map.random([70, 70], 200, width = 10, height = 15, minSize = 4, maxSize = 12)
+        r = Map.random([70, 70], 50, width = 10, height = 15, minSize = 4, maxSize = 12)
 
         finder = PlaceFinder(r.graph.nodes, DefaultGravityCenterStrategy(), 0)
         finder.find()
@@ -54,7 +54,7 @@ def main(_):
     r = create_Rectangles()
     r.graph.triangulate()
     r.graph.spanning_tree()
-    #r.graph.random_edges(0.1)
+    r.graph.random_edges(0.1)
 
     while not done:
 
@@ -78,14 +78,14 @@ def main(_):
 
 
         size = 5
-        for y, row in enumerate(r.grid.grid):
+        for y, row in enumerate(r.grid.grid.transpose()):
             x = 0
             for v in row:
                 x += 1
 
                 cell = r.grid.cells[v]
                 color = cell.color
-                # color = cell.color if not cell.is_walkable else '#ffffff'
+                color = cell.color if not cell.is_walkable else '#ffffff'
                 screen.fill(hex_to_rgb(color), (x * size, y * size, size - 1, size - 1))
 
         # Go ahead and update the screen with what we've drawn.

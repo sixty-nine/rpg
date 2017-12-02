@@ -2,8 +2,6 @@
 #!/usr/bin/python
 import unittest2, os
 
-from DiceTestCase import DiceTestCase
-
 if __name__ == '__main__':
 	import unittest2
 	loader = unittest2.TestLoader()

@@ -46,10 +46,10 @@ class Graph(object):
         points = []
         self.lookup = []
         i = 0
-        for n in self.nodes:
+        for id, n in enumerate(self.nodes):
             if n.is_main:
                 points.append(n.center)
-                self.lookup.append(n.id)
+                self.lookup.append(id)
             i += 1
 
         tri = Delaunay(points)

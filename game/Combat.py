@@ -58,9 +58,17 @@ class Combat(object):
 		else:
 			self._doAttack(attacker, defender)
 
+	def touch(self, threatRange, modifier, other_ac):
+		attackRoll = Dice(20).roll()
+		critical = attackRoll >= threatRange
+		critical_miss = (attackRoll == 1)
+		touch = (attackRoll + modifier >= other_ac)
+		print '-- Dice roll: %s + %s = %s' % (attackRoll, modifier, attackRoll + modifier)
+		return (touch, critical, critical_miss)
+
 	def _doAttack(self, me, other, weapon = None):
 
-		if isinstance(me, Character):
+		if weapon:
 			if not isinstance(weapon, Weapon):
 				raise ValueError('You can only attack with weapons')
 			ability = Abilities.STRENGTH if not weapon.isRanged else Abilities.DEXTERITY
@@ -74,21 +82,14 @@ class Combat(object):
 			damages = me.damage
 			criticalDmg = 2
 
-		attackRoll = Dice(20).roll()
-		threatRange = threatRange
-		critical = attackRoll >= threatRange
-
 		print '--'
 		print '-- %s attacks %s' % (me.name, other.name)
 
-		print '-- Dice roll: %s + %s = %s' % (attackRoll, modifier, attackRoll + modifier)
+		(touch, critical, critical_miss) = self.touch(threatRange, modifier, other.ac)
 
-		if attackRoll == 1:
+		if critical_miss:
 			print '-- Critical miss'
 			return
-
-		attackRoll += modifier
-		touch = attackRoll >= other.ac
 
 		if not touch:
 			print '-- Miss'
@@ -118,5 +119,5 @@ weapons = {
 	'Glaive of strength': Weapon('Glaive of strength', Damage(6, 2, 5), critical = 3, rightHanded = False, minLevel = 10),
 	'Shortbow': Weapon('Shortbow', Damage(6), critical = 3, range = 50, doubleHanded = True),
 	'Longbow': Weapon('Longbow', Damage(8), critical = 3, range = 100, doubleHanded = True),
-}	
+}
 
