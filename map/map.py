@@ -4,6 +4,9 @@ import numpy as np
 
 from my_random import getRandomPointInEllipse
 
+from numpy.random import random_integers as rand
+
+
 from graph import Graph
 from geometry import Grid, Box, Directions
 from path_finder import PathFinder
@@ -56,6 +59,51 @@ class Path(MapObject):
         grid.draw_path(self.path, self.oid)
 
 
+class Maze(Room):
+
+    def __init__(self, oid, box, fg_col = '#ffffff', bg_col = '#000000', is_walkable = True):
+        super(Maze, self).__init__(oid, box, fg_col, is_walkable)
+        self.box = box
+        self.bg_col = bg_col
+        self.fg_col = fg_col
+
+    def generate(self, complexity = .75, density = .75):
+        # Only odd shapes
+        shape = ((self.box.height // 2) * 2 + 1, (self.box.width // 2) * 2 + 1)
+        # Adjust complexity and density relative to maze size
+        complexity = int(complexity * (5 * (shape[0] + shape[1])))
+        density    = int(density * ((shape[0] // 2) * (shape[1] // 2)))
+        # Build actual maze
+        Z = np.zeros(shape, dtype=bool)
+        # Fill borders
+        # Z[0, :] = Z[-1, :] = 1
+        # Z[:, 0] = Z[:, -1] = 1
+        # Make aisles
+        for i in range(density):
+            x, y = rand(0, shape[1] // 2) * 2, rand(0, shape[0] // 2) * 2
+            Z[y, x] = 1
+            for j in range(complexity):
+                neighbours = []
+                if x > 1:             neighbours.append((y, x - 2))
+                if x < shape[1] - 2:  neighbours.append((y, x + 2))
+                if y > 1:             neighbours.append((y - 2, x))
+                if y < shape[0] - 2:  neighbours.append((y + 2, x))
+                if len(neighbours):
+                    y_,x_ = neighbours[rand(0, len(neighbours) - 1)]
+                    if Z[y_, x_] == 0:
+                        Z[y_, x_] = 1
+                        Z[y_ + (y - y_) // 2, x_ + (x - x_) // 2] = 1
+                        x, y = x_, y_
+        return Z
+
+    def draw(self, grid):
+        super(Maze, self).draw(grid)
+        m = self.generate()
+        for i, row in enumerate(m):
+            for j, val in enumerate(row):
+                if val:
+                    grid[self.box.x1 + i, self.box.y1 + j] = 0
+
 class Map(object):
 
     def __init__(self, width, height):
@@ -73,6 +121,12 @@ class Map(object):
         cur = self._cur_oid
         self._cur_oid += 1
         return cur
+
+    def add_object(self, obj):
+        oid = self.get_next_oid()
+        obj.oid = oid
+        self.objects.append(obj)
+        return oid
 
     def add_point(self, point, color = '#ffffff', is_walkable = True):
         oid = self.get_next_oid()

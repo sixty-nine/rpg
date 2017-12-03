@@ -1,4 +1,4 @@
-from map import Map, Room, Graph
+from map import Map, Room, Graph, Maze
 from map.geometry import Box
 from map.drawer import Drawable, Plotter, ScaffoldDrawer, MapDrawer
 from map.utils import hex_to_rgb
@@ -16,12 +16,13 @@ boxes = [
     Box(4, 4, 6, 6),
     Box(20, 10, 15, 10),
     Box(2, 20, 8, 6),
-    Box(10, 30, 15, 15),
+#    Box(10, 30, 15, 15),
     Box(30, 22, 10, 10),
     Box(45, 30, 15, 15),
     Box(40, 5, 10, 8),
     Box(56, 15, 8, 8),
 ]
+
 
 
 def build_map():
@@ -32,6 +33,8 @@ def build_map():
         m.add_room(b)
         g.add_node(b)
 
+    m.add_object(Maze(0, Box(10, 30, 15, 15)))
+    g.add_node(Box(10, 30, 15, 15))
     m.draw()
 
     g.triangulate()
