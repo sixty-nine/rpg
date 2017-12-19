@@ -23,14 +23,16 @@ class GridTestCase(unittest.TestCase):
         g = Grid(15, 15)
         g.draw_rect(r1)
         g.draw_rect(r2)
-        g.connect(r1, r2)
+        g.my_connect(r1, r2)
 
         path = g.search_path((3, 3), (12, 12), manhattan_distance, g.is_walkable)
         expected = [
-            (3, 3), (3, 4), (3, 5), (3, 6), (3, 7), (3, 8), (3, 9), (3, 10), (3, 11), (3, 12),
-            (4, 12), (5, 12), (6, 12), (7, 12), (8, 12), (9, 12), (10, 12), (11, 12), (12, 12)
+            (3, 3), (4, 3), (5, 3), (6, 3),
+            (6, 4), (6, 5), (6, 6), (6, 7), (6, 8), (6, 9), (6, 10), (6, 11), (6, 12),
+            (7, 12), (8, 12), (9, 12), (10, 12), (11, 12), (12, 12)
         ]
 
+        self.assertEqual(len(expected), len(path))
         self.assertEqual(expected, path)
 
     def testGraph1(self):
